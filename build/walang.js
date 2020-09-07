@@ -1,4 +1,4 @@
-class Client{constructor({prefix:e="!",self_commands:t=!0,queue:s=!1,queue_max_length:a=5,fetchInterval:i=100,autosaveInterval:n=1e4}={prefix:"!",self_commands:!0,queue:!1,queue_max_length:5,fetchInterval:100,autosaveInterval:1e4}){this.commands=new Map,this.events={},this.handledMessages=null===localStorage.getItem("handledMessages")?new Array:Array.from(JSON.parse(localStorage.getItem("handledMessages"))),this.messageFetcher=setInterval(()=>{if(null!==getChat()){const i=s?[].slice.call(getChat().children,-a):[getChat().lastChild];for(const s of i)if(s.hasAttribute("data-id")&&!this.handledMessages.includes(s.getAttribute("data-id"))){this.handledMessages.push(s.getAttribute("data-id"));const a=this.getMessageFromElement(s);if(void 0!==a){if(t||s.getAttribute("data-id").startsWith("false_"))for(const[t,s]of this.commands.entries())if(a.content.message.startsWith(e+t))return s(a,a.content.message.substring(e.length+t.length).split(" ").splice(1)),void this.emit("command",[t,s]);this.emit("message",a),this.emit("message_"+(s.getAttribute("data-id").startsWith("true_")?"self":"other"),a)}}}},i),this.autoSaver=setInterval(()=>{localStorage.setItem("handledMessages",JSON.stringify(null===localStorage.getItem("handledMessages")?new Array:Array.from(JSON.parse(localStorage.getItem("handledMessages"))).slice(-10*a)))},n),this.emit("init")}registerCommand(e,t){this.commands.set(e,t)}unregisterCommand(e){this.commands.delete(e)}emit(e,...t){for(let s of this.events[e]||[])s(...t)}on(e,t){return(this.events[e]=this.events[e]||[]).push(t),()=>this.events[e]=this.events[e].filter(e=>e!==t)}sendMessage(e){const t=getTextBox().textContent;getTextBox().textContent=e,getTextBox().dispatchEvent(new InputEvent("input",{bubbles:!0})),new Promise(e=>{null!==getSendButton()&&(getSendButton().click(),getTextBox().textContent=t,getTextBox().dispatchEvent(new InputEvent("input",{bubbles:!0})),e())})}gotoNewestChat(){for(const e of getChats().children)"translateY(0px)"===e.style.transform&&e.firstChild.firstChild.lastChild.firstChild.firstChild.firstChild.firstChild.dispatchEvent(new MouseEvent("mousedown",{bubbles:!0}))}getMessageFromElement(e){if(null===e.querySelector("[data-pre-plain-text]"))return;const t=e.querySelector("[data-pre-plain-text]").getAttribute("data-pre-plain-text").match(/\] (.*):/)[1],s=e.querySelector("[data-pre-plain-text]").lastChild.children[getChat().lastChild.querySelector("[data-pre-plain-text]").lastChild.childElementCount-2].innerText,a=null===e.querySelector("[data-pre-plain-text]").firstChild.firstChild.firstChild.lastChild.firstChild?null:e.querySelector("[data-pre-plain-text]").firstChild.firstChild.firstChild.lastChild.firstChild.lastChild.innerText,i=Array.from(e.querySelector("[data-pre-plain-text]").querySelectorAll("[src^=data]")),n=e.querySelector("[data-pre-plain-text]").getAttribute("data-pre-plain-text").match(/\[(.*)\]/)[1];return new Message(t,new MessageContent(s,a,i),n)}stop(){clearInterval(this.messageFetcher),clearInterval(this.autoSaver)}}const getTextBox=()=>document.querySelector("#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text"),getSendButton=()=>document.querySelector("#main > footer > div._3ee1T._1LkpH.copyable-area > div:nth-child(3) > button"),getChat=()=>document.querySelector("#main > div._3h-WS > div > div > div.z_tTQ"),getChats=()=>document.querySelector("#pane-side > div:nth-child(1) > div > div");class Message{constructor(e,t,s){this.sender=e,this.content=t,this.timestamp=s}}class MessageContent{constructor(e,t,s){this.message=e,this.reaction=t,this.images=s}}
+var client = (function(){class Client{constructor({prefix:e="!",self_commands:t=!0,queue:s=!1,queue_max_length:a=5,fetchInterval:i=100,autosaveInterval:n=1e4}={prefix:"!",self_commands:!0,queue:!1,queue_max_length:5,fetchInterval:100,autosaveInterval:1e4}){this.commands=new Map,this.events={},this.handledMessages=null===localStorage.getItem("handledMessages")?new Array:Array.from(JSON.parse(localStorage.getItem("handledMessages"))),this.messageFetcher=setInterval(()=>{if(null!==getChat()){const i=s?[].slice.call(getChat().children,-a):[getChat().lastChild];for(const s of i)if(s.hasAttribute("data-id")&&!this.handledMessages.includes(s.getAttribute("data-id"))){this.handledMessages.push(s.getAttribute("data-id"));const a=this.getMessageFromElement(s);if(void 0!==a){if(t||s.getAttribute("data-id").startsWith("false_"))for(const[t,s]of this.commands.entries())if(a.content.message.startsWith(e+t))return s(a,a.content.message.substring(e.length+t.length).split(" ").splice(1)),void this.emit("command",[t,s]);this.emit("message",a),this.emit("message_"+(s.getAttribute("data-id").startsWith("true_")?"self":"other"),a)}}}},i),this.autoSaver=setInterval(()=>{localStorage.setItem("handledMessages",JSON.stringify(null===localStorage.getItem("handledMessages")?new Array:Array.from(JSON.parse(localStorage.getItem("handledMessages"))).slice(-10*a)))},n),this.emit("init")}registerCommand(e,t){this.commands.set(e,t)}unregisterCommand(e){this.commands.delete(e)}emit(e,...t){for(let s of this.events[e]||[])s(...t)}on(e,t){return(this.events[e]=this.events[e]||[]).push(t),()=>this.events[e]=this.events[e].filter(e=>e!==t)}sendMessage(e){const t=getTextBox().textContent;getTextBox().textContent=e,getTextBox().dispatchEvent(new InputEvent("input",{bubbles:!0})),new Promise(e=>{null!==getSendButton()&&(getSendButton().click(),getTextBox().textContent=t,getTextBox().dispatchEvent(new InputEvent("input",{bubbles:!0})),e())})}gotoNewestChat(){for(const e of getChats().children)"translateY(0px)"===e.style.transform&&e.firstChild.firstChild.lastChild.firstChild.firstChild.firstChild.firstChild.dispatchEvent(new MouseEvent("mousedown",{bubbles:!0}))}getMessageFromElement(e){if(null===e.querySelector("[data-pre-plain-text]"))return;const t=e.querySelector("[data-pre-plain-text]").getAttribute("data-pre-plain-text").match(/\] (.*):/)[1],s=e.querySelector("[data-pre-plain-text]").lastChild.children[getChat().lastChild.querySelector("[data-pre-plain-text]").lastChild.childElementCount-2].innerText,a=null===e.querySelector("[data-pre-plain-text]").firstChild.firstChild.firstChild.lastChild.firstChild?null:e.querySelector("[data-pre-plain-text]").firstChild.firstChild.firstChild.lastChild.firstChild.lastChild.innerText,i=Array.from(e.querySelector("[data-pre-plain-text]").querySelectorAll("[src^=data]")),n=e.querySelector("[data-pre-plain-text]").getAttribute("data-pre-plain-text").match(/\[(.*)\]/)[1];return new Message(t,new MessageContent(s,a,i),n)}stop(){clearInterval(this.messageFetcher),clearInterval(this.autoSaver)}}const getTextBox=()=>document.querySelector("#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text"),getSendButton=()=>document.querySelector("#main > footer > div._3ee1T._1LkpH.copyable-area > div:nth-child(3) > button"),getChat=()=>document.querySelector("#main > div._3h-WS > div > div > div.z_tTQ"),getChats=()=>document.querySelector("#pane-side > div:nth-child(1) > div > div");class Message{constructor(e,t,s){this.sender=e,this.content=t,this.timestamp=s}}class MessageContent{constructor(e,t,s){this.message=e,this.reaction=t,this.images=s}}
 
 const TokenType = {
   IDENTIFIER: "identifier",
@@ -44,12 +44,12 @@ class Token {
 }
 
 function isLetter(char) {
-  var regex = /[A-Za-z]/;
-  return regex.test(char)
+    var regex = /[A-Za-z]/;
+    return regex.test(char)
 }
 
 function isDigit(char) {
-  return /\d/.test(char);
+    return /\d/.test(char);
 }
 
 var lexerText = "";
@@ -753,13 +753,15 @@ class Node {
 
       CallStack.setCurrentAR(previousAR);
     } else if (this.type == NodeType.EXECUTE_STATEMENT) {
-      throw new Error("Execute statements aren't supported yet");
-
-      /*var previousAR = CallStack.getCurrentAR();
+      var previousAR = CallStack.getCurrentAR();
       var func = this.data.func.visit();
 
+      if (!(func instanceof LangFunction)) {
+        throw new Error("Execute argument is not a function");
+      }
+
       if (func.async) {
-        throw new Error
+        throw new Error("Async functions aren't supported yet");
       }
 
       var ar = new ActivationRecord(null, ARType.ANONYMOUS_FUNCTION, func.ar, previousAR);
@@ -779,7 +781,7 @@ class Node {
       CallStack.setCurrentAR(ar);
 
       if (func.native) {
-        func.code(ar);
+        CallStack.setReturnValue(func.code(ar));
       } else {
         func.block.visit();
       }
@@ -789,7 +791,7 @@ class Node {
 
       CallStack.setCurrentAR(previousAR);
 
-      return result;*/
+      return result;
     } else if (this.type == NodeType.RETURN_STATEMENT) {
       CallStack.setReturnValue(this.data.value.visit());
     }
@@ -981,7 +983,6 @@ class Parser {
     } else if (this.currentToken.type == TokenType.EXECUTE) {
       return this.executeStatement();
     } else if (this.currentToken.type == TokenType.IDENTIFIER) {
-      console.log("factor identifier");
       var name = this.currentToken.value;
       this.eat(TokenType.IDENTIFIER);
 
@@ -1201,9 +1202,6 @@ class Parser {
       statements.push(this.statement());
     }
 
-    console.log(this.currentToken.type + " hoi");
-    //this.eat(TokenType.SEMICOLON);
-
     return new Node(NodeType.STATEMENT_LIST, {
       statements: statements
     });
@@ -1216,6 +1214,251 @@ class Parser {
   }
 }
 
+
+class WaLang {
+
+    static setup() {
+        var globalAr = new ActivationRecord("_GLOBAL", ARType.GLOBAL, null, null);
+
+        globalAr.save("_COOLNESSLEVEL", "Very Cool", true);
+        globalAr.save("_HELP", "-------* Help Menu *-------\nNothing here, yet!", true);
+        globalAr.addFunction("print", new LangFunction(["message"], null, true, false, globalAr, function(ar) {
+            Console.log(ar.get("message"));
+        }));
+        globalAr.addFunction("random", new LangFunction([], null, true, false, globalAr, function(ar) {
+            return Math.random();
+        }));
+        globalAr.addFunction("hours", new LangFunction([], null, true, false, globalAr, function(ar) {
+            var currentdate = new Date();
+            return currentdate.getHours();
+        }));
+        globalAr.addFunction("minutes", new LangFunction([], null, true, false, globalAr, function(ar) {
+            var currentdate = new Date();
+            return currentdate.getMinutes();
+        }));
+        globalAr.addFunction("seconds", new LangFunction([], null, true, false, globalAr, function(ar) {
+            var currentdate = new Date();
+            return currentdate.getSeconds();
+        }));
+        globalAr.addFunction("millis", new LangFunction([], null, true, false, globalAr, function(ar) {
+            var currentdate = new Date();
+            return currentdate.getMilliseconds();
+        }));
+
+        CallStack.setCurrentAR(globalAr);
+    }
+}
+
+var programRunning = false;
+
+class Console {
+
+    static log(message) {
+        client.sendMessage(message);
+    }
+
+    static error(message) {
+        client.sendMessage("*Error: " + message + "*");
+    }
+
+    static logRed(message) {
+        client.sendMessage("*" + message + "*");
+    }
+
+    static programStarted(name) {
+        client.sendMessage("Starting program _" + name + "_...");
+        programRunning = true;
+    }
+
+    static programEnded() {
+        client.sendMessage("Program finished.");
+        programRunning = false;
+    }
+}
+
+var currentAR;
+var returnValue;
+
+class CallStack {
+
+    static setCurrentAR(ar) {
+        currentAR = ar;
+    }
+
+    static getCurrentAR() {
+        return currentAR;
+    }
+
+    static clear() {
+        //Remove all activiation records except global (this plus stopping walking the AST terminates the program)
+        while (currentAR.type !== ARType.GLOBAL) {
+            currentAR = currentAR.caller;
+        }
+    }
+
+    static asString() {
+        var string = "Call Stack (most recent call first):\n" + currentAR.asString();
+
+        return string;
+    }
+
+    static setReturnValue(value) {
+        returnValue = value;
+    }
+
+    static getReturnValue() {
+        return returnValue;
+    }
+}
+
+const ARType = {
+    GLOBAL: "g",
+    PROGRAM: "program",
+    FUNCTION: "f()",
+    ANONYMOUS_FUNCTION: "anonymous f()",
+    IF_STATEMENT: "if"
+}
+
+class ActivationRecord {
+
+    constructor(name, type, underlyingAR, caller) {
+        this.functions = {};
+        this.name = name;
+        this.type = type;
+        this.underlyingAR = underlyingAR;
+        this.caller = caller;
+        if (underlyingAR !== null) {
+            this.level = underlyingAR.level + 1;
+        } else {
+            this.level = 0;
+        }
+        if (caller !== null) {
+            this.callLevel = caller.callLevel + 1;
+
+            if (this.callLevel > 2000) {
+                throw new Error("Max stack size exceeded (2000)");
+            }
+        } else {
+            this.callLevel = 0;
+        }
+
+        this.vars = { _CONTEXT: this.asString() };
+    }
+
+    forceSave(name, value) {
+        this.vars[name] = value;
+    }
+
+    save(name, value, declare) {
+        if (declare) {
+            if (this.getLocal(name) !== undefined) {
+                throw new Error("Variable '" + name + "' is already declared");
+            }
+
+            this.vars[name] = value;
+        } else {
+            if (this.getLocal(name) === undefined) {
+                if (this.underlyingAR !== null) {
+                    this.underlyingAR.save(name, value, false);
+                } else {
+                    throw new Error("Variable '" + name + "' is not declared");
+                }
+            } else {
+                this.vars[name] = value;
+            }
+        }
+    }
+
+    addFunction(name, func) {
+        this.functions[name] = func;
+    }
+
+    getLocal(name) {
+        return this.vars[name];
+    }
+
+    get(name) {
+        var result = this.vars[name];
+
+        //If not found in this scope, check in the underlying scopes
+        if (result === undefined && this.level > 0) {
+            result = this.underlyingAR.get(name);
+        }
+
+        return result;
+    }
+
+    getFunction(name) {
+        var result = this.functions[name];
+
+        //If not found in this scope, check in the underlying scopes
+        if (result === undefined && this.level > 0) {
+            result = this.underlyingAR.getFunction(name);
+        }
+
+        return result;
+    }
+
+    asString() {
+        return "    " + this.callLevel + ": " + this.type + (this.name == null ? "" : " " + this.name) + (this.caller == null ? "" : "\n" + this.caller.asString());
+    }
+}
+
+class Interpreter {
+
+    static execute(commandString) {
+        try {
+            var tree = new Parser(commandString).parse();
+        } catch (error) {
+            Console.error(error.message);
+            console.error(error);
+  
+            return;
+        }
+        try {
+            var result = tree.visit();
+            if (result !== undefined) {
+              Console.log(result);
+            }
+        } catch (error) {
+            Console.error(error.message);
+            console.error(error);
+  
+            //Show callstack
+            Console.logRed(CallStack.asString());
+        }
+  
+        CallStack.clear();
+    }
+  
+    static executeProgram(program, name) {
+        Console.programStarted(name);
+  
+        try {
+            var tree = new Parser(program).parse();
+        } catch (error) {
+            Console.error(error.message);
+            console.error(error);
+  
+            return;
+        }
+        try {
+            var ar = new ActivationRecord(name, ARType.PROGRAM, CallStack.getCurrentAR(), CallStack.getCurrentAR());
+            CallStack.setCurrentAR(ar);
+  
+            tree.visit();
+        } catch (error) {
+            Console.error(error.message);
+            console.error(error);
+  
+            //Show callstack
+            Console.logRed(CallStack.asString());
+        }
+  
+        CallStack.clear();
+        Console.programEnded();
+    }
+}
 
 const client = new Client({ queue: true });
 
@@ -1261,3 +1504,4 @@ client.registerCommand('run', (message, args) => {
   }
 });
 
+return client; })();

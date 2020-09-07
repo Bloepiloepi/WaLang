@@ -18,12 +18,14 @@ https.get('https://raw.githubusercontent.com/kiipy/whatt/master/build/whatt.min.
 });
 
 const createBundle = (library) => {
-    var bundle = '';
+    var bundle = 'var client = (function(){';
     bundle += library + '\n\n';
 
     for (const file of fs.readdirSync('./src')) {
         bundle += fs.readFileSync(path.join(__dirname, `/src/${file}`)) + '\n\n';
     }
+
+    bundle += 'return client; })();';
 
     return bundle;
 }

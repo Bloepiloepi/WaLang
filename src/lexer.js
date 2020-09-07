@@ -42,12 +42,12 @@ class Token {
 }
 
 function isLetter(char) {
-  var regex = /[A-Za-z]/;
-  return regex.test(char)
+    var regex = /[A-Za-z]/;
+    return regex.test(char)
 }
 
 function isDigit(char) {
-  return /\d/.test(char);
+    return /\d/.test(char);
 }
 
 var lexerText = "";
