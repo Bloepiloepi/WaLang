@@ -295,13 +295,15 @@ class Node {
 
       CallStack.setCurrentAR(previousAR);
     } else if (this.type == NodeType.EXECUTE_STATEMENT) {
-      throw new Error("Execute statements aren't supported yet");
-
-      /*var previousAR = CallStack.getCurrentAR();
+      var previousAR = CallStack.getCurrentAR();
       var func = this.data.func.visit();
 
+      if (!(func instanceof LangFunction)) {
+        throw new Error("Execute argument is not a function");
+      }
+
       if (func.async) {
-        throw new Error
+        throw new Error("Async functions aren't supported yet");
       }
 
       var ar = new ActivationRecord(null, ARType.ANONYMOUS_FUNCTION, func.ar, previousAR);
@@ -321,7 +323,7 @@ class Node {
       CallStack.setCurrentAR(ar);
 
       if (func.native) {
-        func.code(ar);
+        CallStack.setReturnValue(func.code(ar));
       } else {
         func.block.visit();
       }
@@ -331,7 +333,7 @@ class Node {
 
       CallStack.setCurrentAR(previousAR);
 
-      return result;*/
+      return result;
     } else if (this.type == NodeType.RETURN_STATEMENT) {
       CallStack.setReturnValue(this.data.value.visit());
     }
