@@ -8,6 +8,9 @@ class WaLang {
         globalAr.addFunction("print", new LangFunction(["message"], null, true, false, globalAr, function(ar) {
             Console.log(ar.get("message"));
         }));
+        globalAr.addFunction("random", new LangFunction([], null, true, false, globalAr, function(ar) {
+            return Math.random();
+        }));
         globalAr.addFunction("hours", new LangFunction([], null, true, false, globalAr, function(ar) {
             var currentdate = new Date();
             return currentdate.getHours();
