@@ -4,35 +4,40 @@ var programs = new Map();
 
 WaLang.setup();
 
-client.on('message', (message) => {
-    try {
-        var text = message.content.message;
+client.registerCommand('help', () => client.sendMessage("!program\n!run\n\nType these commands for more information."));
 
-        var programArray = text.split('\n');
-        var command = programArray[0];
-        programArray.shift();
+client.registerCommand('program', (message) => {
+  const args = message.content.message.split('\n').join(' ').split(' ');
 
-        var program = programArray.join('\n');
-
-        var words = command.split(' ');
-
-        if (words[0] == "!define" && words.length == 2) {
-            var programName = words[1];
-
-            programs.set(programName, program);
-        }
-    } catch (error) {
-        console.log(error);
-    }
+  if (args.length < 2) {
+    client.sendMessage('Usage: !program <name> <code>')
+  } else {
+    programs.set(args[1], args.splice(2).join(' '));
+  }
 });
 
 client.registerCommand('run', (message, args) => {
-    var programName = args[0];
-    var program = programs.get(programName);
-
-    if (program == undefined) {
-        client.sendMessage("That program does not exist.");
+  if (args.length === 0) {
+    if (message.content.reaction === null) {
+      client.sendMessage('Usage: !run <name>\nUsage: React to the program you want to run.');
     } else {
+      const programName = message.content.reaction.split('\n').join(' ').split(' ')[1];
+      const program = programs.get(programName);
+    
+      if (program === undefined) {
+        client.sendMessage("That program does not exist.");
+      } else {
         Interpreter.executeProgram(program, programName);
+      }
     }
+  } else {
+    const programName = args[0];
+    const program = programs.get(programName);
+  
+    if (program === undefined) {
+      client.sendMessage("That program does not exist.");
+    } else {
+      Interpreter.executeProgram(program, programName);
+    }
+  }
 });

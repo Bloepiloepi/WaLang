@@ -203,6 +203,259 @@ class Lexer {
 }
 
 
+class WaLang {
+
+  static setup() {
+    var globalAr = new ActivationRecord("_GLOBAL", ARType.GLOBAL, null, null);
+
+    //Mathematical constants
+    globalAr.save("_PI", Math.PI, true);
+
+    globalAr.save("_E", Math.E, true);
+
+    //Help
+    globalAr.save("_HELP", "-------* Help Menu *-------\nComing soon...", true);
+
+    //Easter Eggs
+    globalAr.save("_COOLNESSLEVEL", "Very Cool", true);
+
+    //Print
+    globalAr.addFunction("print", new LangFunction(["message"], null, true, false, globalAr, (ar) => Console.log(ar.get("message"))));
+
+    //Math
+    globalAr.addFunction("sqrt", new LangFunction(["number"], null, true, false, globalAr, (ar) => Math.sqrt(ar.get("number"))));
+    globalAr.addFunction("random", new LangFunction([], null, true, false, globalAr, () => Math.random()));
+
+    //Time
+    globalAr.addFunction("year", new LangFunction([], null, true, false, globalAr, () => new Date().getFullYear()));
+
+    globalAr.addFunction("month", new LangFunction([], null, true, false, globalAr, () => new Date().getMonth()));
+
+    globalAr.addFunction("day", new LangFunction([], null, true, false, globalAr, () => new Date().getDay()));
+
+    globalAr.addFunction("hours", new LangFunction([], null, true, false, globalAr, () => new Date().getHours()));
+
+    globalAr.addFunction("minutes", new LangFunction([], null, true, false, globalAr, () => new Date().getMinutes()));
+
+    globalAr.addFunction("seconds", new LangFunction([], null, true, false, globalAr, () => new Date().getSeconds()));
+
+    globalAr.addFunction("millis", new LangFunction([], null, true, false, globalAr, () => new Date().getMilliseconds()));
+
+    CallStack.setCurrentAR(globalAr);
+  }
+}
+
+var programRunning = false;
+
+class Console {
+
+  static log(message) {
+    client.sendMessage(message);
+  }
+
+  static error(message) {
+    client.sendMessage("*Error: " + message + "*");
+  }
+
+  static logRed(message) {
+    client.sendMessage("*" + message + "*");
+  }
+
+  static programStarted(name) {
+    client.sendMessage("Starting program _" + name + "_...");
+    programRunning = true;
+  }
+
+  static programEnded() {
+    client.sendMessage("Program finished.");
+    programRunning = false;
+  }
+}
+
+var currentAR;
+var returnValue;
+
+class CallStack {
+
+  static setCurrentAR(ar) {
+    currentAR = ar;
+  }
+
+  static getCurrentAR() {
+    return currentAR;
+  }
+
+  static clear() {
+    //Remove all activiation records except global (this plus stopping walking the AST terminates the program)
+    while (currentAR.type !== ARType.GLOBAL) {
+      currentAR = currentAR.caller;
+    }
+  }
+
+  static asString() {
+    var string = "Call Stack (most recent call first):\n" + currentAR.asString();
+
+    return string;
+  }
+
+  static setReturnValue(value) {
+    returnValue = value;
+  }
+
+  static getReturnValue() {
+    return returnValue;
+  }
+}
+
+const ARType = {
+  GLOBAL: "g",
+  PROGRAM: "program",
+  FUNCTION: "f()",
+  ANONYMOUS_FUNCTION: "anonymous f()",
+  IF_STATEMENT: "if"
+}
+
+class ActivationRecord {
+
+  constructor(name, type, underlyingAR, caller) {
+    this.functions = {};
+    this.name = name;
+    this.type = type;
+    this.underlyingAR = underlyingAR;
+    this.caller = caller;
+    if (underlyingAR !== null) {
+      this.level = underlyingAR.level + 1;
+    } else {
+      this.level = 0;
+    }
+    if (caller !== null) {
+      this.callLevel = caller.callLevel + 1;
+
+      if (this.callLevel > 2000) {
+        throw new Error("Max stack size exceeded (2000)");
+      }
+    } else {
+      this.callLevel = 0;
+    }
+
+    this.vars = { _CONTEXT: this.asString() };
+  }
+
+  forceSave(name, value) {
+    this.vars[name] = value;
+  }
+
+  save(name, value, declare) {
+    if (declare) {
+      if (this.getLocal(name) !== undefined) {
+        throw new Error("Variable '" + name + "' is already declared");
+      }
+
+      this.vars[name] = value;
+    } else {
+      if (this.getLocal(name) === undefined) {
+        if (this.underlyingAR !== null) {
+          this.underlyingAR.save(name, value, false);
+        } else {
+          throw new Error("Variable '" + name + "' is not declared");
+        }
+      } else {
+        this.vars[name] = value;
+      }
+    }
+  }
+
+  addFunction(name, func) {
+    this.functions[name] = func;
+  }
+
+  getLocal(name) {
+    return this.vars[name];
+  }
+
+  get(name) {
+    var result = this.vars[name];
+
+    //If not found in this scope, check in the underlying scopes
+    if (result === undefined && this.level > 0) {
+      result = this.underlyingAR.get(name);
+    }
+
+    return result;
+  }
+
+  getFunction(name) {
+    var result = this.functions[name];
+
+    //If not found in this scope, check in the underlying scopes
+    if (result === undefined && this.level > 0) {
+      result = this.underlyingAR.getFunction(name);
+    }
+
+    return result;
+  }
+
+  asString() {
+    return "    " + this.callLevel + ": " + this.type + (this.name == null ? "" : " " + this.name) + (this.caller == null ? "" : "\n" + this.caller.asString());
+  }
+}
+
+class Interpreter {
+
+  static execute(commandString) {
+    try {
+      var tree = new Parser(commandString).parse();
+    } catch (error) {
+      Console.error(error.message);
+      console.error(error);
+  
+      return;
+    }
+    try {
+      var result = tree.visit();
+      if (result !== undefined) {
+        Console.log(result);
+      }
+    } catch (error) {
+      Console.error(error.message);
+      console.error(error);
+  
+      //Show callstack
+      Console.logRed(CallStack.asString());
+    }
+  
+    CallStack.clear();
+  }
+  
+  static executeProgram(program, name) {
+    Console.programStarted(name);
+  
+    try {
+      var tree = new Parser(program).parse();
+    } catch (error) {
+      Console.error(error.message);
+      console.error(error);
+  
+      return;
+    }
+    try {
+      var ar = new ActivationRecord(name, ARType.PROGRAM, CallStack.getCurrentAR(), CallStack.getCurrentAR());
+      CallStack.setCurrentAR(ar);
+  
+      tree.visit();
+    } catch (error) {
+      Console.error(error.message);
+      console.error(error);
+  
+      //Show callstack
+      Console.logRed(CallStack.asString());
+    }
+  
+    CallStack.clear();
+    Console.programEnded();
+  }
+}
+
 const NodeType = {
   FUNCTION_CALL: "call",
   EXPRESSION: "expression",
@@ -1213,37 +1466,42 @@ var programs = new Map();
 
 WaLang.setup();
 
-client.on('message', (message) => {
-    try {
-        var text = message.content.message;
+client.registerCommand('help', () => client.sendMessage("!program\n!run\n\nType these commands for more information."));
 
-        var programArray = text.split('\n');
-        var command = programArray[0];
-        programArray.shift();
+client.registerCommand('program', (message) => {
+  const args = message.content.message.split('\n').join(' ').split(' ');
 
-        var program = programArray.join('\n');
-
-        var words = command.split(' ');
-
-        if (words[0] == "!define" && words.length == 2) {
-            var programName = words[1];
-
-            programs.set(programName, program);
-        }
-    } catch (error) {
-        console.log(error);
-    }
+  if (args.length < 2) {
+    client.sendMessage('Usage: !program <name> <code>')
+  } else {
+    programs.set(args[1], args.splice(2).join(' '));
+  }
 });
 
 client.registerCommand('run', (message, args) => {
-    var programName = args[0];
-    var program = programs.get(programName);
-
-    if (program == undefined) {
-        client.sendMessage("That program does not exist.");
+  if (args.length === 0) {
+    if (message.content.reaction === null) {
+      client.sendMessage('Usage: !run <name>\nUsage: React to the program you want to run.');
     } else {
+      const programName = message.content.reaction.split('\n').join(' ').split(' ')[1];
+      const program = programs.get(programName);
+    
+      if (program === undefined) {
+        client.sendMessage("That program does not exist.");
+      } else {
         Interpreter.executeProgram(program, programName);
+      }
     }
+  } else {
+    const programName = args[0];
+    const program = programs.get(programName);
+  
+    if (program === undefined) {
+      client.sendMessage("That program does not exist.");
+    } else {
+      Interpreter.executeProgram(program, programName);
+    }
+  }
 });
 
 return client; })();
