@@ -1,4 +1,4 @@
-class Client{constructor({prefix:e="!",self_commands:t=!0,queue:s=!1,queue_max_length:a=5,fetchInterval:i=100,autosaveInterval:n=1e4}={prefix:"!",self_commands:!0,queue:!1,queue_max_length:5,fetchInterval:100,autosaveInterval:1e4}){this.commands=new Map,this.events={},this.handledMessages=null===localStorage.getItem("handledMessages")?new Array:Array.from(JSON.parse(localStorage.getItem("handledMessages"))),setInterval(()=>{if(null!==getChat()){const i=s?[].slice.call(getChat().children,-a):[getChat().lastChild];for(const s of i)if(s.hasAttribute("data-id")&&!this.handledMessages.includes(s.getAttribute("data-id"))){this.handledMessages.push(s.getAttribute("data-id"));const a=this.getMessageFromElement(s);if(void 0!==a){if(t||s.getAttribute("data-id").startsWith("false_"))for(const[t,s]of this.commands.entries())if(a.content.message.startsWith(e+t))return s(a,a.content.message.substring(e.length+t.length).split(" ").splice(1)),void this.emit("command",[t,s]);this.emit("message",a),this.emit("message_"+(s.getAttribute("data-id").startsWith("true_")?"self":"other"),a)}}}},i),setInterval(()=>{localStorage.setItem("handledMessages",JSON.stringify(null===localStorage.getItem("handledMessages")?new Array:Array.from(JSON.parse(localStorage.getItem("handledMessages"))).slice(-10*a)))},n),this.emit("init")}registerCommand(e,t){this.commands.set(e,t)}unregisterCommand(e){this.commands.delete(e)}emit(e,...t){for(let s of this.events[e]||[])s(...t)}on(e,t){return(this.events[e]=this.events[e]||[]).push(t),()=>this.events[e]=this.events[e].filter(e=>e!==t)}sendMessage(e){const t=getTextBox().textContent;getTextBox().textContent=e,getTextBox().dispatchEvent(new InputEvent("input",{bubbles:!0})),new Promise(e=>{null!==getSendButton()&&(getSendButton().click(),getTextBox().textContent=t,getTextBox().dispatchEvent(new InputEvent("input",{bubbles:!0})),e())})}gotoNewestChat(){for(const e of getChats().children)"translateY(0px)"===e.style.transform&&e.firstChild.firstChild.lastChild.firstChild.firstChild.firstChild.firstChild.dispatchEvent(new MouseEvent("mousedown",{bubbles:!0}))}getMessageFromElement(e){if(null===e.querySelector("[data-pre-plain-text]"))return;const t=e.querySelector("[data-pre-plain-text]").getAttribute("data-pre-plain-text").match(/\] (.*):/)[1],s=e.querySelector("[data-pre-plain-text]").lastChild.children[getChat().lastChild.querySelector("[data-pre-plain-text]").lastChild.childElementCount-2].innerText,a=null===e.querySelector("[data-pre-plain-text]").firstChild.firstChild.firstChild.lastChild.firstChild?null:e.querySelector("[data-pre-plain-text]").firstChild.firstChild.firstChild.lastChild.firstChild.lastChild.innerText,i=Array.from(e.querySelector("[data-pre-plain-text]").querySelectorAll("[src^=data]")),n=e.querySelector("[data-pre-plain-text]").getAttribute("data-pre-plain-text").match(/\[(.*)\]/)[1];return new Message(t,new MessageContent(s,a,i),n)}}const getTextBox=()=>document.querySelector("#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text"),getSendButton=()=>document.querySelector("#main > footer > div._3ee1T._1LkpH.copyable-area > div:nth-child(3) > button"),getChat=()=>document.querySelector("#main > div._3h-WS > div > div > div.z_tTQ"),getChats=()=>document.querySelector("#pane-side > div:nth-child(1) > div > div");class Message{constructor(e,t,s){this.sender=e,this.content=t,this.timestamp=s}}class MessageContent{constructor(e,t,s){this.message=e,this.reaction=t,this.images=s}}
+var client = (function(){class Client{constructor({prefix:e="!",self_commands:t=!0,queue:s=!1,queue_max_length:a=5,fetchInterval:i=100,autosaveInterval:n=1e4}={prefix:"!",self_commands:!0,queue:!1,queue_max_length:5,fetchInterval:100,autosaveInterval:1e4}){this.commands=new Map,this.events={},this.handledMessages=null===localStorage.getItem("handledMessages")?new Array:Array.from(JSON.parse(localStorage.getItem("handledMessages"))),this.messageFetcher=setInterval(()=>{if(null!==getChat()){const i=s?[].slice.call(getChat().children,-a):[getChat().lastChild];for(const s of i)if(s.hasAttribute("data-id")&&!this.handledMessages.includes(s.getAttribute("data-id"))){this.handledMessages.push(s.getAttribute("data-id"));const a=this.getMessageFromElement(s);if(void 0!==a){if(t||s.getAttribute("data-id").startsWith("false_"))for(const[t,s]of this.commands.entries())if(a.content.message.startsWith(e+t))return s(a,a.content.message.substring(e.length+t.length).split(" ").splice(1)),void this.emit("command",[t,s]);this.emit("message",a),this.emit("message_"+(s.getAttribute("data-id").startsWith("true_")?"self":"other"),a)}}}},i),this.autoSaver=setInterval(()=>{localStorage.setItem("handledMessages",JSON.stringify(null===localStorage.getItem("handledMessages")?new Array:Array.from(JSON.parse(localStorage.getItem("handledMessages"))).slice(-10*a)))},n),this.emit("init")}registerCommand(e,t){this.commands.set(e,t)}unregisterCommand(e){this.commands.delete(e)}emit(e,...t){for(let s of this.events[e]||[])s(...t)}on(e,t){return(this.events[e]=this.events[e]||[]).push(t),()=>this.events[e]=this.events[e].filter(e=>e!==t)}sendMessage(e){const t=getTextBox().textContent;getTextBox().textContent=e,getTextBox().dispatchEvent(new InputEvent("input",{bubbles:!0})),new Promise(e=>{null!==getSendButton()&&(getSendButton().click(),getTextBox().textContent=t,getTextBox().dispatchEvent(new InputEvent("input",{bubbles:!0})),e())})}gotoNewestChat(){for(const e of getChats().children)"translateY(0px)"===e.style.transform&&e.firstChild.firstChild.lastChild.firstChild.firstChild.firstChild.firstChild.dispatchEvent(new MouseEvent("mousedown",{bubbles:!0}))}getMessageFromElement(e){if(null===e.querySelector("[data-pre-plain-text]"))return;const t=e.querySelector("[data-pre-plain-text]").getAttribute("data-pre-plain-text").match(/\] (.*):/)[1],s=e.querySelector("[data-pre-plain-text]").lastChild.children[getChat().lastChild.querySelector("[data-pre-plain-text]").lastChild.childElementCount-2].innerText,a=null===e.querySelector("[data-pre-plain-text]").firstChild.firstChild.firstChild.lastChild.firstChild?null:e.querySelector("[data-pre-plain-text]").firstChild.firstChild.firstChild.lastChild.firstChild.lastChild.innerText,i=Array.from(e.querySelector("[data-pre-plain-text]").querySelectorAll("[src^=data]")),n=e.querySelector("[data-pre-plain-text]").getAttribute("data-pre-plain-text").match(/\[(.*)\]/)[1];return new Message(t,new MessageContent(s,a,i),n)}stop(){clearInterval(this.messageFetcher),clearInterval(this.autoSaver)}}const getTextBox=()=>document.querySelector("#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text"),getSendButton=()=>document.querySelector("#main > footer > div._3ee1T._1LkpH.copyable-area > div:nth-child(3) > button"),getChat=()=>document.querySelector("#main > div._3h-WS > div > div > div.z_tTQ"),getChats=()=>document.querySelector("#pane-side > div:nth-child(1) > div > div");class Message{constructor(e,t,s){this.sender=e,this.content=t,this.timestamp=s}}class MessageContent{constructor(e,t,s){this.message=e,this.reaction=t,this.images=s}}
 
 const TokenType = {
   IDENTIFIER: "identifier",
@@ -44,12 +44,12 @@ class Token {
 }
 
 function isLetter(char) {
-  var regex = /[A-Za-z]/;
-  return regex.test(char)
+    var regex = /[A-Za-z]/;
+    return regex.test(char)
 }
 
 function isDigit(char) {
-  return /\d/.test(char);
+    return /\d/.test(char);
 }
 
 var lexerText = "";
@@ -204,344 +204,346 @@ class Lexer {
 
 
 const NodeType = {
-    FUNCTION_CALL: "call",
-    EXPRESSION: "expression",
-    ASSIGNMENT: "assignment",
-    FUNCTION_DECLARATION: "functionDeclaration",
-    STATEMENT_LIST: "statementList",
-    RETURN_STATEMENT: "returnStatement",
-    EXECUTE_STATEMENT: "executeStatement",
-    IF_STATEMENT: "ifStatement",
-    NO_STATEMENT: "noStatement"
+  FUNCTION_CALL: "call",
+  EXPRESSION: "expression",
+  ASSIGNMENT: "assignment",
+  FUNCTION_DECLARATION: "functionDeclaration",
+  STATEMENT_LIST: "statementList",
+  RETURN_STATEMENT: "returnStatement",
+  EXECUTE_STATEMENT: "executeStatement",
+  IF_STATEMENT: "ifStatement",
+  NO_STATEMENT: "noStatement"
+}
+
+const ExpressionType = {
+  BINARY_OPERATOR: "binaryOperator",
+  UNARY_OPERATOR: "unaryOperator",
+  NUMBER: "number",
+  VARIABLE: "variable",
+  STRING: "string",
+  GETFUNC: "getfunc",
+  DIRECT_BOOLEAN: "boolean"
+}
+
+const OperatorType = {
+  PLUS: "+",
+  MINUS: "-",
+  MULTIPLY: "*",
+  DIVIDE: "/",
+  EQUALS: "==",
+  GREATER_THAN: ">",
+  LESS_THAN: "<"
+}
+
+class LangFunction {
+
+  constructor(parameters, block, native, async, ar, code) {
+    this.parameters = parameters;
+    this.block = block;
+    this.native = native;
+    this.async = async;
+    this.ar = ar;
+    this.code = code;
   }
-  
-  const ExpressionType = {
-    BINARY_OPERATOR: "binaryOperator",
-    UNARY_OPERATOR: "unaryOperator",
-    NUMBER: "number",
-    VARIABLE: "variable",
-    STRING: "string",
-    GETFUNC: "getfunc",
-    DIRECT_BOOLEAN: "boolean"
+}
+LangFunction.prototype.toString = function () {
+  return "f()";
+};
+
+class Node {
+
+  constructor(type, data) {
+    this.type = type;
+    this.data = data;
   }
-  
-  const OperatorType = {
-    PLUS: "+",
-    MINUS: "-",
-    MULTIPLY: "*",
-    DIVIDE: "/",
-    EQUALS: "==",
-    GREATER_THAN: ">",
-    LESS_THAN: "<"
-  }
-  
-  class LangFunction {
-  
-    constructor(parameters, block, native, async, ar, code) {
-      this.parameters = parameters;
-      this.block = block;
-      this.native = native;
-      this.async = async;
-      this.ar = ar;
-      this.code = code;
-    }
-  }
-  LangFunction.prototype.toString = function () {
-    return "f()";
-  };
-  
-  class Node {
-  
-    constructor(type, data) {
-      this.type = type;
-      this.data = data;
-    }
-  
-    visit() {
-      if (this.type == NodeType.EXPRESSION) {
-        const checkOperand = (typeList, operand) => {
-          return typeList.includes(typeof operand);
+
+  visit() {
+    if (this.type == NodeType.EXPRESSION) {
+      const checkOperand = (typeList, operand) => {
+        return typeList.includes(typeof operand);
+      }
+      const operandError = (operand, operator) => {
+        if (operand === undefined) {
+          operand = "void";
         }
-        const operandError = (operand, operator) => {
-          if (operand === undefined) {
-            operand = "void";
+
+        throw new Error("Operator '" + operator + "' does not support operand '" + operand + "'");
+      }
+
+      if (this.data.type == ExpressionType.BINARY_OPERATOR) {
+        if (this.data.operator == OperatorType.PLUS) {
+          var operand1 = this.data.operand1.visit();
+          var operand2 = this.data.operand2.visit();
+
+          if (!checkOperand(["string", "number"], operand1)) {
+            operandError(operand1, this.data.operator);
           }
-  
-          throw new Error("Operator '" + operator + "' does not support operand '" + operand + "'");
-        }
-  
-        if (this.data.type == ExpressionType.BINARY_OPERATOR) {
-          if (this.data.operator == OperatorType.PLUS) {
-            var operand1 = this.data.operand1.visit();
-            var operand2 = this.data.operand2.visit();
-  
-            if (!checkOperand(["string", "number"], operand1)) {
-              operandError(operand1, this.data.operator);
-            }
-            if (!checkOperand(["string", "number"], operand2)) {
-              operandError(operand2, this.data.operator);
-            }
-  
-            var result = operand1 + operand2;
-  
-            if (result > 2147483647 || result < -2147483647) {
-              throw new Error("Max integer value is 2147483647");
-            }
-  
-            return result;
-          } else if (this.data.operator == OperatorType.MINUS) {
-            var operand1 = this.data.operand1.visit();
-            var operand2 = this.data.operand2.visit();
-  
-            if (!checkOperand(["number"], operand1)) {
-              operandError(operand1, this.data.operator);
-            }
-            if (!checkOperand(["number"], operand2)) {
-              operandError(operand2, this.data.operator);
-            }
-  
-            var result = operand1 - operand2;
-  
-            if (result > 2147483647 || result < -2147483647) {
-              throw new Error("Max integer value is 2147483647");
-            }
-  
-            return result;
-          } else if (this.data.operator == OperatorType.MULTIPLY) {
-            var operand1 = this.data.operand1.visit();
-            var operand2 = this.data.operand2.visit();
-  
-            if (!checkOperand(["string", "number"], operand1)) {
-              operandError(operand1, this.data.operator);
-            }
-            if (!checkOperand(["string", "number"], operand2)) {
-              operandError(operand2, this.data.operator);
-            }
-            if (typeof operand1 == "string" && typeof operand2 == "string") {
-              throw new Error("Can't multiply 2 strings, only numbers or a string and a number");
-            }
-  
-            if (typeof operand1 == "string") {
-              return operand1.repeat(operand2);
-            } else if (typeof operand2 == "string") {
-              return operand2.repeat(operand1);
-            } else {
-              var result = operand1 * operand2;
-  
-              if (result > 2147483647 || result < -2147483647) {
-                throw new Error("Max integer value is 2147483647");
-              }
-  
-              return result;
-            }
-          } else if (this.data.operator == OperatorType.DIVIDE) {
-            var operand1 = this.data.operand1.visit();
-            var operand2 = this.data.operand2.visit();
-  
-            if (!checkOperand(["number"], operand1)) {
-              operandError(operand1, this.data.operator);
-            }
-            if (!checkOperand(["number"], operand2)) {
-              operandError(operand2, this.data.operator);
-            }
-  
-            var result = operand1 / operand2;
-  
-            if (result > 2147483647 || result < -2147483647) {
-              throw new Error("Max integer value is 2147483647");
-            }
-  
-            return result;
-          } else if (this.data.operator == OperatorType.EQUALS) {
-            var operand1 = this.data.operand1.visit();
-            var operand2 = this.data.operand2.visit();
-  
-            return operand1 == operand2;
-          } else if (this.data.operator == OperatorType.GREATER_THAN) {
-            var operand1 = this.data.operand1.visit();
-            var operand2 = this.data.operand2.visit();
-  
-            if (!checkOperand(["number"], operand1)) {
-              operandError(operand1, this.data.operator);
-            }
-            if (!checkOperand(["number"], operand2)) {
-              operandError(operand2, this.data.operator);
-            }
-  
-            return operand1 > operand2;
-          } else if (this.data.operator == OperatorType.LESS_THAN) {
-            var operand1 = this.data.operand1.visit();
-            var operand2 = this.data.operand2.visit();
-  
-            if (!checkOperand(["number"], operand1)) {
-              operandError(operand1, this.data.operator);
-            }
-            if (!checkOperand(["number"], operand2)) {
-              operandError(operand2, this.data.operator);
-            }
-  
-            return operand1 < operand2;
+          if (!checkOperand(["string", "number"], operand2)) {
+            operandError(operand2, this.data.operator);
           }
-        } else if (this.data.type == ExpressionType.UNARY_OPERATOR) {
-          var operand = this.data.operand1.visit();
-  
-          if (!checkOperand(["number"], operand)) {
-            operandError(operand, this.data.operator);
+
+          var result = operand1 + operand2;
+
+          if (result > 2147483647 || result < -2147483647) {
+            throw new Error("Max integer value is 2147483647");
           }
-  
-          if (this.data.operator == OperatorType.PLUS) {
-            return +operand;
-          } else if (this.data.operator == OperatorType.MINUS) {
-            return -operand;
+
+          return result;
+        } else if (this.data.operator == OperatorType.MINUS) {
+          var operand1 = this.data.operand1.visit();
+          var operand2 = this.data.operand2.visit();
+
+          if (!checkOperand(["number"], operand1)) {
+            operandError(operand1, this.data.operator);
           }
-        } else if (this.data.type == ExpressionType.NUMBER || this.data.type == ExpressionType.STRING || this.data.type == ExpressionType.DIRECT_BOOLEAN) {
-          return this.data.value;
-        } else if (this.data.type == ExpressionType.VARIABLE) {
-          var ar = CallStack.getCurrentAR();
-  
-          var value = ar.get(this.data.name);
-          if (value !== undefined) {
-            return value;
+          if (!checkOperand(["number"], operand2)) {
+            operandError(operand2, this.data.operator);
+          }
+
+          var result = operand1 - operand2;
+
+          if (result > 2147483647 || result < -2147483647) {
+            throw new Error("Max integer value is 2147483647");
+          }
+
+          return result;
+        } else if (this.data.operator == OperatorType.MULTIPLY) {
+          var operand1 = this.data.operand1.visit();
+          var operand2 = this.data.operand2.visit();
+
+          if (!checkOperand(["string", "number"], operand1)) {
+            operandError(operand1, this.data.operator);
+          }
+          if (!checkOperand(["string", "number"], operand2)) {
+            operandError(operand2, this.data.operator);
+          }
+          if (typeof operand1 == "string" && typeof operand2 == "string") {
+            throw new Error("Can't multiply 2 strings, only numbers or a string and a number");
+          }
+
+          if (typeof operand1 == "string") {
+            return operand1.repeat(operand2);
+          } else if (typeof operand2 == "string") {
+            return operand2.repeat(operand1);
           } else {
-            throw new Error("Variable '" + this.data.name + "' is not defined");
+            var result = operand1 * operand2;
+
+            if (result > 2147483647 || result < -2147483647) {
+              throw new Error("Max integer value is 2147483647");
+            }
+
+            return result;
           }
-        } else if (this.data.type == ExpressionType.GETFUNC) {
-          var func = CallStack.getCurrentAR().getFunction(this.data.name);
-  
-          if (func === undefined) {
-            throw new Error("Function '" + this.data.name + "' is not defined");
+        } else if (this.data.operator == OperatorType.DIVIDE) {
+          var operand1 = this.data.operand1.visit();
+          var operand2 = this.data.operand2.visit();
+
+          if (!checkOperand(["number"], operand1)) {
+            operandError(operand1, this.data.operator);
           }
-  
-          return func;
+          if (!checkOperand(["number"], operand2)) {
+            operandError(operand2, this.data.operator);
+          }
+
+          var result = operand1 / operand2;
+
+          if (result > 2147483647 || result < -2147483647) {
+            throw new Error("Max integer value is 2147483647");
+          }
+
+          return result;
+        } else if (this.data.operator == OperatorType.EQUALS) {
+          var operand1 = this.data.operand1.visit();
+          var operand2 = this.data.operand2.visit();
+
+          return operand1 == operand2;
+        } else if (this.data.operator == OperatorType.GREATER_THAN) {
+          var operand1 = this.data.operand1.visit();
+          var operand2 = this.data.operand2.visit();
+
+          if (!checkOperand(["number"], operand1)) {
+            operandError(operand1, this.data.operator);
+          }
+          if (!checkOperand(["number"], operand2)) {
+            operandError(operand2, this.data.operator);
+          }
+
+          return operand1 > operand2;
+        } else if (this.data.operator == OperatorType.LESS_THAN) {
+          var operand1 = this.data.operand1.visit();
+          var operand2 = this.data.operand2.visit();
+
+          if (!checkOperand(["number"], operand1)) {
+            operandError(operand1, this.data.operator);
+          }
+          if (!checkOperand(["number"], operand2)) {
+            operandError(operand2, this.data.operator);
+          }
+
+          return operand1 < operand2;
         }
-      } else if (this.type == NodeType.ASSIGNMENT) {
-        if (this.data.name.charAt(0) == "_") {
-          throw new Error("Can't create or change static variables (starting with '_')");
+      } else if (this.data.type == ExpressionType.UNARY_OPERATOR) {
+        var operand = this.data.operand1.visit();
+
+        if (!checkOperand(["number"], operand)) {
+          operandError(operand, this.data.operator);
+        }
+
+        if (this.data.operator == OperatorType.PLUS) {
+          return +operand;
+        } else if (this.data.operator == OperatorType.MINUS) {
+          return -operand;
+        }
+      } else if (this.data.type == ExpressionType.NUMBER || this.data.type == ExpressionType.STRING || this.data.type == ExpressionType.DIRECT_BOOLEAN) {
+        return this.data.value;
+      } else if (this.data.type == ExpressionType.VARIABLE) {
+        var ar = CallStack.getCurrentAR();
+
+        var value = ar.get(this.data.name);
+        if (value !== undefined) {
+          return value;
         } else {
-          CallStack.getCurrentAR().save(this.data.name, this.data.value.visit(), this.data.declare);
+          throw new Error("Variable '" + this.data.name + "' is not defined");
         }
-      } else if (this.type == NodeType.STATEMENT_LIST) {
-        if (CallStack.getCurrentAR().type == ARType.GLOBAL && this.data.statements.length == 1) {
-          return this.data.statements[0].visit();
-        }
-  
-        for (var i = 0; i < this.data.statements.length; i++) {
-          this.data.statements[i].visit();
-  
-          if (CallStack.getReturnValue() !== undefined) {
-            break;
-          }
-        }
-      } else if (this.type == NodeType.FUNCTION_DECLARATION) {
-        CallStack.getCurrentAR().addFunction(this.data.name, new LangFunction(this.data.parameters, this.data.block, false, this.data.async, CallStack.getCurrentAR(), null));
-      } else if (this.type == NodeType.FUNCTION_CALL) {
-        var previousAR = CallStack.getCurrentAR();
-        var func = previousAR.getFunction(this.data.name);
-  
+      } else if (this.data.type == ExpressionType.GETFUNC) {
+        var func = CallStack.getCurrentAR().getFunction(this.data.name);
+
         if (func === undefined) {
           throw new Error("Function '" + this.data.name + "' is not defined");
         }
-  
-        if (func.async) {
-          throw new Error("Async functions aren't supported yet");
+
+        return func;
+      }
+    } else if (this.type == NodeType.ASSIGNMENT) {
+      if (this.data.name.charAt(0) == "_") {
+        throw new Error("Can't create or change static variables (starting with '_')");
+      } else {
+        CallStack.getCurrentAR().save(this.data.name, this.data.value.visit(), this.data.declare);
+      }
+    } else if (this.type == NodeType.STATEMENT_LIST) {
+      if (CallStack.getCurrentAR().type == ARType.GLOBAL && this.data.statements.length == 1) {
+        return this.data.statements[0].visit();
+      }
+
+      for (var i = 0; i < this.data.statements.length; i++) {
+        this.data.statements[i].visit();
+
+        if (CallStack.getReturnValue() !== undefined) {
+          break;
         }
-  
-        var result;
-  
-        var times = this.data.times.visit();
-        if (typeof times !== "number") {
-          throw new Error("Function execute number must be a number");
-        }
-  
-        for (var j = 0; j < times; j++) {
-          var ar = new ActivationRecord(this.data.name, ARType.FUNCTION, func.ar, previousAR);
-  
-          var formalParameters = func.parameters;
-          var actualParameters = this.data.parameters;
-  
-          for (var i = 0; i < formalParameters.length; i++) {
-            var name = formalParameters[i];
-            if (actualParameters[name] === undefined) {
-              throw new Error("Parameter not present in function call '" + this.data.name + "': '" + name + "'");
-            }
-  
-            ar.save(name, actualParameters[name].visit(), true);
-          }
-  
-          CallStack.setCurrentAR(ar);
-  
-          if (func.native) {
-            CallStack.setReturnValue(func.code(ar));
-          } else {
-            func.block.visit();
-          }
-  
-          result = CallStack.getReturnValue();
-          CallStack.setReturnValue(undefined);
-  
-          CallStack.setCurrentAR(previousAR);
-        }
-  
-        return result;
-      } else if (this.type == NodeType.IF_STATEMENT) {
-        var previousAR = CallStack.getCurrentAR();
-        var ar = new ActivationRecord(null, ARType.IF_STATEMENT, previousAR, previousAR);
-        CallStack.setCurrentAR(ar);
-  
-        var bool = this.data.expression.visit();
-  
-        if (typeof bool !== "boolean") {
-          throw new Error("If expression is not a boolean");
-        }
-  
-        if (bool) {
-          this.data.block.visit();
-        }
-  
-        CallStack.setCurrentAR(previousAR);
-      } else if (this.type == NodeType.EXECUTE_STATEMENT) {
-        throw new Error("Execute statements aren't supported yet");
-  
-        /*var previousAR = CallStack.getCurrentAR();
-        var func = this.data.func.visit();
-  
-        if (func.async) {
-          throw new Error
-        }
-  
-        var ar = new ActivationRecord(null, ARType.ANONYMOUS_FUNCTION, func.ar, previousAR);
-  
+      }
+    } else if (this.type == NodeType.FUNCTION_DECLARATION) {
+      CallStack.getCurrentAR().addFunction(this.data.name, new LangFunction(this.data.parameters, this.data.block, false, this.data.async, CallStack.getCurrentAR(), null));
+    } else if (this.type == NodeType.FUNCTION_CALL) {
+      var previousAR = CallStack.getCurrentAR();
+      var func = previousAR.getFunction(this.data.name);
+
+      if (func === undefined) {
+        throw new Error("Function '" + this.data.name + "' is not defined");
+      }
+
+      if (func.async) {
+        throw new Error("Async functions aren't supported yet");
+      }
+
+      var result;
+
+      var times = this.data.times.visit();
+      if (typeof times !== "number") {
+        throw new Error("Function execute number must be a number");
+      }
+
+      for (var j = 0; j < times; j++) {
+        var ar = new ActivationRecord(this.data.name, ARType.FUNCTION, func.ar, previousAR);
+
         var formalParameters = func.parameters;
         var actualParameters = this.data.parameters;
-  
+
         for (var i = 0; i < formalParameters.length; i++) {
           var name = formalParameters[i];
           if (actualParameters[name] === undefined) {
             throw new Error("Parameter not present in function call '" + this.data.name + "': '" + name + "'");
           }
-  
+
           ar.save(name, actualParameters[name].visit(), true);
         }
-  
+
         CallStack.setCurrentAR(ar);
-  
+
         if (func.native) {
-          func.code(ar);
+          CallStack.setReturnValue(func.code(ar));
         } else {
           func.block.visit();
         }
-  
-        var result = CallStack.getReturnValue();
+
+        result = CallStack.getReturnValue();
         CallStack.setReturnValue(undefined);
-  
+
         CallStack.setCurrentAR(previousAR);
-  
-        return result;*/
-      } else if (this.type == NodeType.RETURN_STATEMENT) {
-        CallStack.setReturnValue(this.data.value.visit());
       }
+
+      return result;
+    } else if (this.type == NodeType.IF_STATEMENT) {
+      var previousAR = CallStack.getCurrentAR();
+      var ar = new ActivationRecord(null, ARType.IF_STATEMENT, previousAR, previousAR);
+      CallStack.setCurrentAR(ar);
+
+      var bool = this.data.expression.visit();
+
+      if (typeof bool !== "boolean") {
+        throw new Error("If expression is not a boolean");
+      }
+
+      if (bool) {
+        this.data.block.visit();
+      }
+
+      CallStack.setCurrentAR(previousAR);
+    } else if (this.type == NodeType.EXECUTE_STATEMENT) {
+      var previousAR = CallStack.getCurrentAR();
+      var func = this.data.func.visit();
+
+      if (!(func instanceof LangFunction)) {
+        throw new Error("Execute argument is not a function");
+      }
+
+      if (func.async) {
+        throw new Error("Async functions aren't supported yet");
+      }
+
+      var ar = new ActivationRecord(null, ARType.ANONYMOUS_FUNCTION, func.ar, previousAR);
+
+      var formalParameters = func.parameters;
+      var actualParameters = this.data.parameters;
+
+      for (var i = 0; i < formalParameters.length; i++) {
+        var name = formalParameters[i];
+        if (actualParameters[name] === undefined) {
+          throw new Error("Parameter not present in function call '" + this.data.name + "': '" + name + "'");
+        }
+
+        ar.save(name, actualParameters[name].visit(), true);
+      }
+
+      CallStack.setCurrentAR(ar);
+
+      if (func.native) {
+        CallStack.setReturnValue(func.code(ar));
+      } else {
+        func.block.visit();
+      }
+
+      var result = CallStack.getReturnValue();
+      CallStack.setReturnValue(undefined);
+
+      CallStack.setCurrentAR(previousAR);
+
+      return result;
+    } else if (this.type == NodeType.RETURN_STATEMENT) {
+      CallStack.setReturnValue(this.data.value.visit());
     }
   }
+}
 
 class Parser {
 
@@ -1244,3 +1246,4 @@ client.registerCommand('run', (message, args) => {
     }
 });
 
+return client; })();
