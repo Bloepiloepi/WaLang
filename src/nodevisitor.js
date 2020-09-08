@@ -227,6 +227,9 @@ class Node {
           break;
         }
       }
+
+      //After each code block, process the enqueued functions
+      TaskManager.process();
     } else if (this.type == NodeType.FUNCTION_DECLARATION) {
       CallStack.getCurrentAR().addFunction(this.data.name, new LangFunction(this.data.parameters, this.data.block, false, this.data.async, CallStack.getCurrentAR(), null));
     } else if (this.type == NodeType.FUNCTION_CALL) {
@@ -246,6 +249,9 @@ class Node {
       var times = this.data.times.visit();
       if (typeof times !== "number") {
         throw new Error("Function execute number must be a number");
+      }
+      if (times > 100) {
+        throw new Error("Maximum times ('#') is 100");
       }
 
       for (var j = 0; j < times; j++) {
@@ -314,7 +320,7 @@ class Node {
       for (var i = 0; i < formalParameters.length; i++) {
         var name = formalParameters[i];
         if (actualParameters[name] === undefined) {
-          throw new Error("Parameter not present in function call '" + this.data.name + "': '" + name + "'");
+          throw new Error("Parameter not present in function call anonymous: '" + name + "'");
         }
 
         ar.save(name, actualParameters[name].visit(), true);

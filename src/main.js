@@ -17,6 +17,15 @@ class WaLang {
     //Print
     globalAr.addFunction("print", new LangFunction(["message"], null, true, false, globalAr, (ar) => Console.log(ar.get("message"))));
 
+    //Queue
+    globalAr.addFunction("enqueue", new LangFunction(["task"], null, true, false, globalAr, (ar) => TaskManager.addToQueue(ar.get("task"))));
+    globalAr.addFunction("delay", new LangFunction(["task", "millis"], null, true, false, globalAr, (ar) => {
+      var currentTimeStamp = Date.now().valueOf();
+      var executeTimeStamp = currentTimeStamp + ar.get("millis");
+
+      TaskManager.addTimedTask(new TimedTask(ar.get("task"), executeTimeStamp));
+    }));
+
     //Math
     globalAr.addFunction("sqrt", new LangFunction(["number"], null, true, false, globalAr, (ar) => Math.sqrt(ar.get("number"))));
     globalAr.addFunction("random", new LangFunction([], null, true, false, globalAr, () => Math.random()));
@@ -107,7 +116,8 @@ const ARType = {
   PROGRAM: "program",
   FUNCTION: "f()",
   ANONYMOUS_FUNCTION: "anonymous f()",
-  IF_STATEMENT: "if"
+  IF_STATEMENT: "if",
+  TASK: "task"
 }
 
 class ActivationRecord {
@@ -248,5 +258,62 @@ class Interpreter {
   
     CallStack.clear();
     Console.programEnded();
+  }
+}
+
+class TimedTask {
+
+  constructor(func, timestamp) {
+    this.func = func;
+    this.timestamp = timestamp;
+  }
+}
+
+const toExecuteAtTime = [];
+const taskQueue = [];
+
+class TaskManager {
+  
+  static addTimedTask(task) {
+    console.log("addTimedTask " + task.timestamp);
+    toExecuteAtTime.push(task);
+  }
+
+  static addToQueue(func) {
+    taskQueue.push(func);
+  }
+
+  static process() {
+    for (var timedTask of toExecuteAtTime) {
+      if (Date.now().valueOf() >= timedTask.timestamp) {
+        taskQueue.push(timedTask.func);
+        toExecuteAtTime.splice(toExecuteAtTime.indexOf(timedTask), 1);
+      }
+    }
+
+    while (taskQueue.length > 0) {
+      var func = taskQueue.shift();
+      this.executeFunction(func);
+    }
+  }
+
+  static executeFunction(func) {
+    var previousAR = CallStack.getCurrentAR();
+
+    if (func.async) {
+      throw new Error("Async functions aren't supported yet");
+    }
+
+    var ar = new ActivationRecord(null, ARType.TASK, func.ar, null);
+
+    CallStack.setCurrentAR(ar);
+
+    if (func.native) {
+      func.code(ar);
+    } else {
+      func.block.visit();
+    }
+
+    CallStack.setCurrentAR(previousAR);
   }
 }
