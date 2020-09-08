@@ -17,6 +17,10 @@ client.registerCommand('program', (message) => {
 });
 
 client.registerCommand('run', (message, args) => {
+  if (programRunning) {
+    Console.error("Cant run 2 programs at the same time.");
+    return;
+  }
   if (args.length === 0) {
     if (message.content.reaction === null) {
       client.sendMessage('Usage: !run <name>\nUsage: React to the program you want to run.');

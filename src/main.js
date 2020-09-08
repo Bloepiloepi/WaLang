@@ -89,7 +89,16 @@ class CallStack {
     return currentAR;
   }
 
-  static clear() {
+  static clear(keepProgram) {
+    if (keepProgram) {
+      while (currentAR.type !== ARType.PROGRAM) {
+        currentAR = currentAR.caller;
+      }
+
+      return;
+    }
+
+    //If reaches here, keepProgram is false
     //Remove all activiation records except global (this plus stopping walking the AST terminates the program)
     while (currentAR.type !== ARType.GLOBAL) {
       currentAR = currentAR.caller;
@@ -206,31 +215,6 @@ class ActivationRecord {
 }
 
 class Interpreter {
-
-  static execute(commandString) {
-    try {
-      var tree = new Parser(commandString).parse();
-    } catch (error) {
-      Console.error(error.message);
-      console.error(error);
-  
-      return;
-    }
-    try {
-      var result = tree.visit();
-      if (result !== undefined) {
-        Console.log(result);
-      }
-    } catch (error) {
-      Console.error(error.message);
-      console.error(error);
-  
-      //Show callstack
-      Console.logRed(CallStack.asString());
-    }
-  
-    CallStack.clear();
-  }
   
   static executeProgram(program, name) {
     Console.programStarted(name);
@@ -256,8 +240,9 @@ class Interpreter {
       Console.logRed(CallStack.asString());
     }
   
-    CallStack.clear();
-    Console.programEnded();
+    CallStack.clear(true);
+
+    TaskManager.remain();
   }
 }
 
@@ -295,6 +280,18 @@ class TaskManager {
       var func = taskQueue.shift();
       this.executeFunction(func);
     }
+  }
+
+  static remain() {
+    var interval = setInterval(() => {
+      process();
+
+      if (toExecuteAtTime.length == 0) {
+        CallStack.clear(false);
+        Console.programEnded();
+        clearInterval(interval);
+      }
+    }, 5);
   }
 
   static executeFunction(func) {
