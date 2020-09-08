@@ -275,8 +275,10 @@ class Console {
     programRunning = true;
   }
 
-  static programEnded() {
-    client.sendMessage("Program finished.");
+  static programEnded(silent) {
+    if (!silent) {
+      client.sendMessage("Program finished.");
+    }
     programRunning = false;
   }
 }
@@ -429,6 +431,8 @@ class Interpreter {
     } catch (error) {
       Console.error(error.message);
       console.error(error);
+
+      Console.programEnded(true);
   
       return;
     }
@@ -465,7 +469,6 @@ const taskQueue = [];
 class TaskManager {
   
   static addTimedTask(task) {
-    console.log("addTimedTask " + task.timestamp);
     toExecuteAtTime.push(task);
   }
 
@@ -489,14 +492,14 @@ class TaskManager {
 
   static remain() {
     var interval = setInterval(() => {
-      process();
+      TaskManager.process();
 
       if (toExecuteAtTime.length == 0) {
         CallStack.clear(false);
         Console.programEnded();
         clearInterval(interval);
       }
-    }, 5);
+    }, 10);
   }
 
   static executeFunction(func) {
@@ -1305,7 +1308,7 @@ client.registerCommand('program', (message) => {
 
 client.registerCommand('run', (message, args) => {
   if (programRunning) {
-    Console.error("Cant run 2 programs at the same time.");
+    Console.error("Can't run 2 programs at the same time");
     return;
   }
   if (args.length === 0) {

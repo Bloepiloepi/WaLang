@@ -70,8 +70,10 @@ class Console {
     programRunning = true;
   }
 
-  static programEnded() {
-    client.sendMessage("Program finished.");
+  static programEnded(silent) {
+    if (!silent) {
+      client.sendMessage("Program finished.");
+    }
     programRunning = false;
   }
 }
@@ -224,6 +226,8 @@ class Interpreter {
     } catch (error) {
       Console.error(error.message);
       console.error(error);
+
+      Console.programEnded(true);
   
       return;
     }
@@ -260,7 +264,6 @@ const taskQueue = [];
 class TaskManager {
   
   static addTimedTask(task) {
-    console.log("addTimedTask " + task.timestamp);
     toExecuteAtTime.push(task);
   }
 
@@ -284,14 +287,14 @@ class TaskManager {
 
   static remain() {
     var interval = setInterval(() => {
-      process();
+      TaskManager.process();
 
       if (toExecuteAtTime.length == 0) {
         CallStack.clear(false);
         Console.programEnded();
         clearInterval(interval);
       }
-    }, 5);
+    }, 10);
   }
 
   static executeFunction(func) {
