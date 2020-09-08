@@ -7,6 +7,10 @@ WaLang is a programming language. This repo is the version as WhatsApp bot.
 To use this programming language in WhatsApp bot form, you should paste the code inside the console of the WhatsApp tab. You can find the code with each release inside `walang.min.js` (or if you prefer the readable but much bigger version, you can find it in `walang.js`). To run the latest build you can also pick those files from the build folder in source code, but it might not be stable and working.  
 Once you have pasted the code in the console, you're done and the bot should be working.
 
+### Build the bot yourself (not recommended)
+
+To build the bot yourself you can download the source code and then run the command `node index.js` (of course you should be in the folder of that file and have node installed). This will create / change the files in the build folder to fresh ones and will also update the library used.
+
 ## How does the bot work?
 
 The bot is using [this](https://github.com/kiipy/whatt) library. To execute a command, type a '!' in prefix of the command.  
