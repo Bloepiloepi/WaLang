@@ -82,11 +82,31 @@ class Lexer {
     return lexerText.charAt(lexerPos + 1);
   }
 
+  skipWhitespace() {
+    while (/\s+/.test(currentChar)) {
+      this.advance();
+    }
+  }
+
+  skipComment() {
+    this.advance();
+    this.advance();
+
+    while (currentChar != "\n" && currentChar != "") {
+      this.advance();
+    }
+    this.advance();
+
+    this.skipWhitespace();
+  }
+
   getNextToken() {
     var token = undefined;
 
-    while (/\s+/.test(currentChar)) {
-      this.advance();
+    this.skipWhitespace();
+
+    if (currentChar == '/' && this.peekChar() == '/') {
+      this.skipComment();
     }
 
     Object.keys(TokenType).forEach(function (key) {

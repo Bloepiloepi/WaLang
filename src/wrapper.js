@@ -8,11 +8,14 @@ client.registerCommand('help', () => client.sendMessage("!program\n!run\n\nType 
 
 client.registerCommand('program', (message) => {
   const args = message.content.message.split('\n').join(' ').split(' ');
+  var program = message.content.message.split('\n');
+  program.shift();
+  program = program.join('\n');
 
   if (args.length < 2) {
-    client.sendMessage('Usage: !program <name> <code>')
+    client.sendMessage('Usage: !program <name> <code>');
   } else {
-    programs.set(args[1], args.splice(2).join(' '));
+    programs.set(args[1], program);
   }
 });
 
